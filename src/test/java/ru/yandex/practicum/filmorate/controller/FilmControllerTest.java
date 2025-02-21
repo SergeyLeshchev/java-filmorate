@@ -19,7 +19,7 @@ class FilmControllerTest {
     void generateData() {
         filmController = new FilmController();
         film = new Film(1L, "Name", "Description", LocalDate.parse("2000-01-01"),
-                Duration.ofSeconds(3600));
+                Duration.ofSeconds(3600), 5);
     }
 
     @Test
@@ -32,7 +32,7 @@ class FilmControllerTest {
     @Test
     void updateFilmTest() {
         Film film2 = new Film(1L, "Name2", "Description2", LocalDate.parse("2002-01-01"),
-                Duration.ofSeconds(1800));
+                Duration.ofSeconds(1800), 3);
         filmController.addFilm(film);
         filmController.updateFilm(film2);
         assertEquals(film2, new ArrayList<>(filmController.getFilms()).getFirst(),

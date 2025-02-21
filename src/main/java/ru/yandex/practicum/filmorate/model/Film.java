@@ -24,16 +24,19 @@ public class Film {
     private LocalDate releaseDate;
     @NonNull
     private Duration duration;
+    private int rate;
 
     public Film(Long id,
                 @NonNull String name,
                 @NonNull String description,
                 @NonNull LocalDate releaseDate,
-                @NonNull Duration duration) {
+                @NonNull Duration duration,
+                int rate) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.rate = rate;
     }
 }

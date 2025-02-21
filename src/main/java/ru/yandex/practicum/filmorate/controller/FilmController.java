@@ -17,6 +17,7 @@ import java.util.Map;
 public class FilmController {
     private final Map<Long, Film> films = new HashMap<>();
     private long idCounter = 1;
+
     // добавление фильма
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
@@ -33,7 +34,7 @@ public class FilmController {
     public Film updateFilm(@RequestBody Film film) {
         log.info("Вход в метод обновления данных фильма");
         validateFilm(film);
-        if(!films.containsKey(film.getId())) {
+        if (!films.containsKey(film.getId())) {
             log.warn("Исключение NotFoundException. Фильм с таким id не найден");
             throw new NotFoundException("Фильм с таким id не найден");
         }
@@ -51,29 +52,27 @@ public class FilmController {
 
     private void validateFilm(Film film) {
         // название не может быть пустым
-        if(film.getName() == null || film.getName().isBlank()) {
+        if (film.getName() == null || film.getName().isBlank()) {
             log.warn("Исключение ValidationException. Название не может быть пустым");
             throw new ValidationException("Название не может быть пустым");
         }
 
         // максимальная длина описания — 200 символов
-        if(film.getDescription().length() > 200) {
+        if (film.getDescription().length() > 200) {
             log.warn("Исключение ValidationException. Максимальная длина описания — 200 символов");
             throw new ValidationException("Максимальная длина описания — 200 символов");
         }
 
         // дата релиза — не раньше 28 декабря 1895 года
-        if(film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) {
+        if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) {
             log.warn("Исключение ValidationException. Дата релиза — должна быть не раньше 28 декабря 1895 года");
             throw new ValidationException("Дата релиза — должна быть не раньше 28 декабря 1895 года");
         }
         // продолжительность фильма должна быть положительным числом
-        if(film.getDuration().isNegative()) {
+        if (film.getDuration().isNegative()) {
             log.warn("Исключение ValidationException. Продолжительность фильма должна быть положительным числом");
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
         }
         log.info("Валидация данных фильма прошла успешно");
     }
-
-
 }

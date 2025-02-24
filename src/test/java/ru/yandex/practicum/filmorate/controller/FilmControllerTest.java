@@ -40,9 +40,16 @@ class FilmControllerTest {
     }
 
     @Test
-    void validateFilmTest() {
+    void validateRightFilmTest() {
         assertDoesNotThrow(() -> filmController.addFilm(film),
                 "Валидация не пропустила фильм с правильными полями");
+    }
+
+    @Test
+    void validateFilmNameTest() {
+        film.setName(null);
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film),
+                "Валидация пропустила null в название фильма");
 
         film.setName("");
         assertThrows(ValidationException.class, () -> filmController.updateFilm(film),
@@ -51,24 +58,32 @@ class FilmControllerTest {
         film.setName(" ");
         assertThrows(ValidationException.class, () -> filmController.updateFilm(film),
                 "Валидация пропустила название фильма из одного пробела");
+    }
 
-        film.setName("Name");
+    @Test
+    void validateFilmDescriptionTest() {
         film.setDescription("В описании этого фильма больше 200 символов" +
                 "В описании этого фильма больше 200 символов" +
                 "В описании этого фильма больше 200 символов" +
                 "В описании этого фильма больше 200 символов" +
                 "В описании этого фильма больше 200 символов");
-        assertThrows(ValidationException.class, () -> filmController.updateFilm(film),
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film),
                 "Валидация пропустила описание фильма длиннее 200 символов");
+    }
 
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.parse("1895-12-27"));
-        assertThrows(ValidationException.class, () -> filmController.updateFilm(film),
+    @Test
+    void validateFilmReleaseDateTest() {
+        // 28 декабря 1895 года считается днём рождения кино
+        final LocalDate BIRTHDAY_FILM = LocalDate.parse("1895-12-28");
+        film.setReleaseDate(BIRTHDAY_FILM.minusDays(1));
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film),
                 "Валидация пропустила дату создания фильма раньше 1895-12-28");
+    }
 
-        film.setReleaseDate(LocalDate.parse("2000-01-01"));
+    @Test
+    void validateFilmDurationTest() {
         film.setDuration(Duration.ofSeconds(-1));
-        assertThrows(ValidationException.class, () -> filmController.updateFilm(film),
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film),
                 "Валидация пропустила отрицательную продолжительность фильма");
     }
 }

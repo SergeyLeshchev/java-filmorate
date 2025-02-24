@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -20,37 +21,38 @@ public class UserController {
 
     // создание пользователя
     @PostMapping
-    public User addUser(@RequestBody User user) {
-        log.info("Вход в метод добавления нового пользователя");
+    public User addUser(@Valid @RequestBody User user) {
+        log.info("addUser() - получен запрос на добавление пользователя {}", user);
         validateUser(user);
         user.setId(id++);
         users.put(user.getId(), user);
-        log.info("Новый пользователь успешно добавлен");
+        log.info("addUser() - новый пользователь {} успешно добавлен", user);
         return user;
     }
 
     // обновление пользователя
     @PutMapping
-    public User updateUser(@RequestBody User user) {
-        log.info("Вход в метод обновления данных пользователя");
+    public User updateUser(@Valid @RequestBody User user) {
+        log.info("updateUser() - получен запрос на обновление данных пользователя {}", user);
         validateUser(user);
         if (!users.containsKey(user.getId())) {
-            log.warn("Исключение NotFoundException. Пользователь с таким id не найден");
+            log.warn("updateUser() - Исключение NotFoundException. Пользователь с id \"{}\" не найден", user.getId());
             throw new NotFoundException("Пользователь с таким id не найден");
         }
         users.put(user.getId(), user);
-        log.info("Данные пользователя успешно обновлены");
+        log.info("updateUser() - Данные пользователя {} успешно обновлены", user);
         return user;
     }
 
     // получение списка всех пользователей
     @GetMapping
     public Collection<User> getUsers() {
-        log.info("Вход в метод получения всех пользователей");
+        log.info("getFilms() - получен запрос на получение всех пользователей");
         return users.values();
     }
 
     public void validateUser(User user) {
+        log.info("Валидация пользователя {}", user);
         // электронная почта не может быть пустой и должна содержать символ @
         if (user.getEmail() == null || user.getEmail().isBlank() || (!user.getEmail().contains("@"))) {
             log.warn("Исключение ValidationException. Электронная почта не может быть пустой и должна содержать " +
@@ -72,6 +74,6 @@ public class UserController {
             log.warn("Исключение ValidationException. Дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
-        log.info("Валидация данных пользователя прошла успешно");
+        log.info("Валидация данных пользователя {} прошла успешно", user);
     }
 }

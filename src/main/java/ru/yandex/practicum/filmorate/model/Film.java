@@ -1,9 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import ru.yandex.practicum.filmorate.annotation.PositiveDuration;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -13,30 +16,18 @@ import java.time.LocalDate;
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Film {
+    // 28 декабря 1895 года считается днём рождения кино
     private Long id;
-    @NonNull
+    @NotBlank
     private String name;
-    @NonNull
+    @Size(max = 200)
     private String description;
-    @NonNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate releaseDate;
-    @NonNull
+    // продолжительность фильма должна быть положительным числом
+    @PositiveDuration
     private Duration duration;
     private int rate;
-
-    public Film(Long id,
-                @NonNull String name,
-                @NonNull String description,
-                @NonNull LocalDate releaseDate,
-                @NonNull Duration duration,
-                int rate) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.rate = rate;
-    }
 }

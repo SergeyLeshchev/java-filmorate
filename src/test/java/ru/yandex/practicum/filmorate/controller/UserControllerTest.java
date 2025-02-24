@@ -41,9 +41,16 @@ public class UserControllerTest {
     }
 
     @Test
-    void validateUserTest() {
+    void validateRightUserTest() {
         assertDoesNotThrow(() -> userController.addUser(user),
                 "Валидация не пропустила пользователя с правильными полями");
+    }
+
+    @Test
+    void validateUserEmailTest() {
+        user.setEmail(null);
+        assertThrows(ValidationException.class, () -> userController.addUser(user),
+                "Валидация пропустила null в email");
 
         user.setEmail("");
         assertThrows(ValidationException.class, () -> userController.updateUser(user),
@@ -56,8 +63,14 @@ public class UserControllerTest {
         user.setEmail("email-2gmail.com");
         assertThrows(ValidationException.class, () -> userController.updateUser(user),
                 "Валидация пропустила email пользователя без символа @");
+    }
 
-        user.setEmail("email@gmail.com");
+    @Test
+    void validateUserLoginTest() {
+        user.setLogin(null);
+        assertThrows(ValidationException.class, () -> userController.addUser(user),
+                "Валидация пропустила null в логин");
+
         user.setLogin("");
         assertThrows(ValidationException.class, () -> userController.updateUser(user),
                 "Валидация пропустила пустую строку в логин");
@@ -69,8 +82,15 @@ public class UserControllerTest {
         user.setLogin("Login login");
         assertThrows(ValidationException.class, () -> userController.updateUser(user),
                 "Валидация пропустила логин пользователя с символом пробела");
+    }
 
-        user.setLogin("Login");
+    @Test
+    void validateUserNameTest() {
+        user.setName(null);
+        userController.addUser(user);
+        assertEquals(user.getLogin(), user.getName(),
+                "Валидация не присвоила логин имени пользователя из null");
+
         user.setName("");
         userController.updateUser(user);
         assertEquals(user.getLogin(), user.getName(),
@@ -80,13 +100,12 @@ public class UserControllerTest {
         userController.updateUser(user);
         assertEquals(user.getLogin(), user.getName(),
                 "Валидация не присвоила логин имени пользователя из одного пробела");
+    }
 
-        user.setName(null);
-        userController.updateUser(user);
-        assertEquals(user.getLogin(), user.getName(), "Валидация не присвоила логин имени пользователя null");
-
+    @Test
+    void validateUserBirthdayTest() {
         user.setBirthday(LocalDate.now().plus(Period.ofDays(1)));
-        assertThrows(ValidationException.class, () -> userController.updateUser(user),
+        assertThrows(ValidationException.class, () -> userController.addUser(user),
                 "Валидация пропустила дату рождения пользователя в будущем");
     }
 }

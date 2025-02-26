@@ -74,9 +74,15 @@ public class FilmController {
         }
 
         // продолжительность фильма должна быть положительным числом
-        if (film.getDuration().isNegative()) {
+        if (film.getDuration() < 1) {
             log.warn("Исключение ValidationException. Продолжительность фильма должна быть положительным числом");
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
+        }
+
+        // оценка фильма должна быть от 1 до 10 баллов
+        if (film.getRate() < 0 || film.getRate() > 10) {
+            log.warn("Исключение ValidationException. Оценка фильма должна быть от 0 до 10 баллов");
+            throw new ValidationException("Оценка фильма должна быть от 0 до 10 баллов");
         }
         log.info("Валидация данных фильма {} прошла успешно", film);
     }

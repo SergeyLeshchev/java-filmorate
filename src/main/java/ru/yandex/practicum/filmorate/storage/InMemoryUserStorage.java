@@ -46,10 +46,13 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User getUser(Long id) {
-        return users.get(id);
-    }
-
-    public Map<Long, User> getUsersMap() {
-        return users;
+        if (!users.containsKey(id)) {
+            throw new NotFoundException("Нет пользователя с таким id");
+        }
+        User user = users.get(id);
+        if (user == null) {
+            throw new NotFoundException("Нет пользователя с таким id");
+        }
+        return user;
     }
 }

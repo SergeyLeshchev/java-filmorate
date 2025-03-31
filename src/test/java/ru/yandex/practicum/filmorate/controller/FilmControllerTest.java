@@ -19,9 +19,7 @@ class FilmControllerTest {
 
     @BeforeEach
     void generateData() {
-
-        filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(new InMemoryFilmStorage(),
-                new InMemoryUserStorage()), new InMemoryUserStorage());
+        filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
         film = new Film(1L, "Name", "Description", LocalDate.parse("2000-01-01"),
                 90, 5);
     }

@@ -10,6 +10,11 @@ import java.time.LocalDate;
 public class FilmValidator {
     public static void validateFilm(Film film) {
         log.info("Валидация фильма {}", film);
+        if (film == null) {
+            log.warn("Исключение ValidationException. Объект film не может быть пустым");
+            throw new ValidationException("Объект film не может быть пустым");
+        }
+
         // название не может быть пустым
         if (film.getName() == null || film.getName().isBlank()) {
             log.warn("Исключение ValidationException. Название не может быть пустым");

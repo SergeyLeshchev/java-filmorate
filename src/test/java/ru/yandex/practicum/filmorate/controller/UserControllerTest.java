@@ -20,7 +20,7 @@ public class UserControllerTest {
 
     @BeforeEach
     void generateData() {
-        userController = new UserController(new InMemoryUserStorage(), new UserService(new InMemoryUserStorage()));
+        userController = new UserController(new UserService(new InMemoryUserStorage()));
         user = new User(1L, "email@gmail.com", "Login", "Name",
                 LocalDate.parse("2000-01-01"));
     }

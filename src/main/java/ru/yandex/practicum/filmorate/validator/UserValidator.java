@@ -10,6 +10,11 @@ import java.time.LocalDate;
 public class UserValidator {
     public static void validateUser(User user) {
         log.info("Валидация пользователя {}", user);
+        if (user == null) {
+            log.warn("Исключение ValidationException. Объект user не может быть пустым");
+            throw new ValidationException("Объект user не может быть пустым");
+        }
+
         // электронная почта не может быть пустой и должна содержать символ @
         if (user.getEmail() == null || user.getEmail().isBlank() || (!user.getEmail().contains("@"))) {
             log.warn("Исключение ValidationException. Электронная почта не может быть пустой и должна содержать " +

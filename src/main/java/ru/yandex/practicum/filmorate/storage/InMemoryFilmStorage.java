@@ -46,10 +46,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public Film getFilm(Long id) {
-        return films.get(id);
-    }
-
-    public Map<Long, Film> getFilmsMap() {
-        return films;
+        if (!films.containsKey(id)) {
+            throw new NotFoundException("Нет фильма с таким id");
+        }
+        Film film = films.get(id);
+        if (film == null) {
+            throw new NotFoundException("Нет фильма с таким id");
+        }
+        return film;
     }
 }

@@ -22,8 +22,6 @@ import java.util.*;
 public class FilmService {
     private final FilmStorage filmStorage;
     private final MpaStorage mpaStorage;
-    private final GenreStorage genreStorage;
-    private final LikesStorage likesStorage;
 
     public List<Film> getFilms() {
         return filmStorage.getFilms();

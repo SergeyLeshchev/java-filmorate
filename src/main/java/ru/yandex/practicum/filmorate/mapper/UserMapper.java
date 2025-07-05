@@ -17,10 +17,8 @@ public final class UserMapper {
         user.setName(request.getName());
         user.setBirthday(request.getBirthday());
         if (request.getFriends() == null) {
-            System.out.println("строка 4");
             user.setFriends(new HashSet<>());
         } else {
-            System.out.println("строка 5");
             user.setFriends(request.getFriends());
         }
         return user;

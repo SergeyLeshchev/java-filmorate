@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.dal.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -17,10 +16,11 @@ public class BaseStorage<T> {
     protected final RowMapper<T> mapper;
 
     protected T findOne(String query, Object... params) {
-        try {
-            return jdbc.queryForObject(query, mapper, params);
-        } catch (EmptyResultDataAccessException ignored) {
+        List<T> results = jdbc.query(query, mapper, params);
+        if (results.isEmpty()) {
             return null;
+        } else {
+            return results.getFirst();
         }
     }
 
@@ -29,7 +29,7 @@ public class BaseStorage<T> {
     }
 
     protected void update(String query, Object... params) {
-        int rowsUpdated = jdbc.update(query, params);
+        jdbc.update(query, params);
     }
 
     protected long insert(String query, Object... params) {

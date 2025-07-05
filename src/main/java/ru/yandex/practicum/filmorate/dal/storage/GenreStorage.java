@@ -13,6 +13,8 @@ import java.util.Set;
 public class GenreStorage extends BaseStorage<Genre> {
     private static final String GET_GENRES = "SELECT * FROM genres ORDER BY genre_id";
     private static final String GET_GENRE_BY_ID = "SELECT * FROM genres WHERE genre_id = ?";
+    private static final String GET_FILM_GENRES = "SELECT g.genre_id, g.name FROM films_genres fg " +
+            "JOIN genres g ON fg.genre_id = g.genre_id WHERE fg.film_id = ? ORDER BY genre_id ASC";
 
     public GenreStorage(JdbcTemplate jdbc, RowMapper<Genre> mapper) {
         super(jdbc, mapper);
@@ -27,8 +29,7 @@ public class GenreStorage extends BaseStorage<Genre> {
     }
 
     public Set<Genre> getFilmGenres(long filmId) {
-        String sql = "SELECT g.genre_id, g.name FROM films_genres fg JOIN genres g ON fg.genre_id = g.genre_id WHERE fg.film_id = ? ORDER BY genre_id ASC";
-        List<Genre> genres = jdbc.query(sql, mapper, filmId);
+        List<Genre> genres = jdbc.query(GET_FILM_GENRES, mapper, filmId);
         return new HashSet<>(genres);
     }
 }

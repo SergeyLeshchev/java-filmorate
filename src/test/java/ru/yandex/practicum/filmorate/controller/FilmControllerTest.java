@@ -28,16 +28,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({FilmDbStorage.class, FilmService.class, FilmController.class,
-        FilmRowMapper.class, MpaStorage.class, GenreStorage.class, MpaRowMapper.class, GenreRowMapper.class,
-        UserController.class, UserDbStorage.class, UserService.class, UserController.class, UserRowMapper.class,
-        LikesStorage.class, LikesRowMapper.class})
+@Import({FilmDbStorage.class, FilmService.class, FilmController.class, FilmRowMapper.class, MpaStorage.class,
+        GenreStorage.class, MpaRowMapper.class, GenreRowMapper.class, UserController.class, UserDbStorage.class,
+        UserService.class, UserController.class, UserRowMapper.class, LikesStorage.class,})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class FilmControllerTest {
-    @Autowired
-    private FilmController filmController;
-    @Autowired
-    private UserController userController;
+    private final FilmController filmController;
+    private final UserController userController;
     private Film film;
     private NewFilmRequest newFilm;
     private UpdateFilmRequest updateFilm;
@@ -46,7 +43,6 @@ public class FilmControllerTest {
 
     @BeforeEach
     void generateData() {
-
         film = new Film(1L, "Name1", "Description1", LocalDate.parse("2001-01-01"),
                 101, 1, mpa, new HashSet<>());
         newFilm = new NewFilmRequest("Name2", "Description2", LocalDate.parse("2002-02-02"),

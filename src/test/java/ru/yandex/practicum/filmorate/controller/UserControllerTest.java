@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Import({UserDbStorage.class, UserService.class, UserController.class, UserRowMapper.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class UserControllerTest {
-    @Autowired
-    private UserController userController;
+    private final UserController userController;
     private User user;
     private NewUserRequest newUser;
     private UpdateUserRequest updateUser;

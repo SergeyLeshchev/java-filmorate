@@ -26,13 +26,7 @@ public class FilmService {
     private final LikesStorage likesStorage;
 
     public List<Film> getFilms() {
-        List<Film> films = filmStorage.getFilms();
-        for (Film film : films) {
-            film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()));
-            film.setGenres(genreStorage.getFilmGenres(film.getId()));
-            film.setLikes(likesStorage.getFilmLikes(film.getId()));
-        }
-        return films;
+        return filmStorage.getFilms();
     }
 
     public Film getFilmById(long filmId) {
@@ -40,20 +34,13 @@ public class FilmService {
         if (film == null) {
             throw new NotFoundException("Фильм с таким id не найден");
         }
-        film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()));
-        film.setGenres(genreStorage.getFilmGenres(filmId));
-        film.setLikes(likesStorage.getFilmLikes(filmId));
         return film;
     }
 
     public Film addFilm(NewFilmRequest request) {
-        System.out.println("вошел в метод сервиса addFilm");
         Film film = FilmMapper.mapToFilm(request);
-        System.out.println("прошел mapToFilm в метод сервиса addFilm");
         film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()));
-        System.out.println("строка7");
         filmStorage.addFilm(film);
-        System.out.println("строка 20");
         return film;
     }
 
@@ -85,11 +72,7 @@ public class FilmService {
     public List<Film> getPopularFilms(int count) {
         log.info("getPopularFilms() - получен запрос на получение популярных фильмов");
         return filmStorage.getPopularFilms(count).stream()
-                .peek(film -> {
-                    film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()));
-                    film.setGenres(genreStorage.getFilmGenres(film.getId()));
-                    film.setLikes(likesStorage.getFilmLikes(film.getId()));
-                }) // сортируем по убыванию лайков
+                // сортируем по убыванию лайков
                 .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
                 .toList();
     }

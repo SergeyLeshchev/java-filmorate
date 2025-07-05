@@ -3,17 +3,19 @@ package ru.yandex.practicum.filmorate.dal.mappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dal.storage.MpaStorage;
+import ru.yandex.practicum.filmorate.dal.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.dal.storage.LikesStorage;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 
 @Component
 @RequiredArgsConstructor
 public class FilmRowMapper implements RowMapper<Film> {
-    private final MpaStorage mpaStorage;
+    private final LikesStorage likesStorage;
+    private final GenreStorage genreStorage;
 
     @Override
     public Film mapRow(ResultSet resultSet, int rowNum) throws SQLException {
@@ -24,9 +26,11 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setReleaseDate(resultSet.getTimestamp("release_date").toLocalDateTime().toLocalDate());
         film.setDuration(resultSet.getInt("duration"));
         film.setRate(resultSet.getInt("rate"));
-        film.setMpa(mpaStorage.getMpaById(resultSet.getInt("mpa_id")));
-        film.setGenres(new HashSet<>());
-        film.setLikes(new HashSet<>());
+        film.setMpa(new Mpa(
+                resultSet.getLong("mpa_id"),
+                resultSet.getString("mpa_name")));
+        film.setGenres(genreStorage.getFilmGenres(film.getId()));
+        film.setLikes(likesStorage.getFilmLikes(film.getId()));
         return film;
     }
 }

@@ -12,23 +12,17 @@ import java.util.HashSet;
 public class FilmMapper {
     public static Film mapToFilm(NewFilmRequest request) {
         Film film = new Film();
-        System.out.println("строка 1");
         film.setName(request.getName());
         film.setDescription(request.getDescription());
         film.setReleaseDate(request.getReleaseDate());
         film.setDuration(request.getDuration());
         film.setRate(request.getRate());
-        System.out.println("строка 2");
         film.setMpa(request.getMpa());
-        System.out.println("строка 3");
         if (request.getGenres() == null) {
-            System.out.println("строка 4");
             film.setGenres(new HashSet<>());
         } else {
-            System.out.println("строка 5");
             film.setGenres(request.getGenres());
         }
-        System.out.println("строка 6");
         return film;
     }
 

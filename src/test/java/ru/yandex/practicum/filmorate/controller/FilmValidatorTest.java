@@ -18,7 +18,7 @@ class FilmValidatorTest {
     @BeforeEach
     void generateData() {
         film = new Film(1L, "Name", "Description", LocalDate.parse("2000-01-01"),
-                90, 5, new Mpa(), new HashSet<>());
+                90, 5, new Mpa(1L, "G"), new HashSet<>());
     }
 
     @Test

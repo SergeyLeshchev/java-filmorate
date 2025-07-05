@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dal.storage.MpaStorage;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -19,7 +18,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
-    //private final MpaStorage mpaStorage;
 
     public List<Film> getFilms() {
         return filmStorage.getFilms();
@@ -35,7 +33,6 @@ public class FilmService {
 
     public Film addFilm(NewFilmRequest request) {
         Film film = FilmMapper.mapToFilm(request);
-        //film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()));
         filmStorage.addFilm(film);
         return film;
     }

@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.dal.storage.LikesStorage;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -18,9 +20,14 @@ import java.util.*;
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
+    private final GenreStorage genreStorage;
+    private final LikesStorage likesStorage;
 
     public List<Film> getFilms() {
-        return filmStorage.getFilms();
+        List<Film> films = filmStorage.getFilms();
+        genreStorage.setGenresOfListFilms(films);
+        likesStorage.setLikesOfListFilms(films);
+        return films;
     }
 
     public Film getFilmById(long filmId) {
@@ -28,6 +35,8 @@ public class FilmService {
         if (film == null) {
             throw new NotFoundException("Фильм с таким id не найден");
         }
+        film.setGenres(genreStorage.getFilmGenres(filmId));
+        film.setLikes(likesStorage.getFilmLikes(film.getId()));
         return film;
     }
 
@@ -64,9 +73,12 @@ public class FilmService {
 
     public List<Film> getPopularFilms(int count) {
         log.info("getPopularFilms() - получен запрос на получение популярных фильмов");
-        return filmStorage.getPopularFilms(count).stream()
+        List<Film> films = filmStorage.getPopularFilms(count).stream()
                 // сортируем по убыванию лайков
                 .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
                 .toList();
+        genreStorage.setGenresOfListFilms(films);
+        likesStorage.setLikesOfListFilms(films);
+        return films;
     }
 }

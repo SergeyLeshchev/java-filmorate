@@ -1,113 +1,130 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
+import ru.yandex.practicum.filmorate.dal.mappers.UserRowMapper;
+import ru.yandex.practicum.filmorate.dal.storage.UserDbStorage;
+import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
-import java.time.Period;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@JdbcTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Import({UserDbStorage.class, UserService.class, UserController.class, UserRowMapper.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class UserControllerTest {
-    private UserController userController;
+    private final UserController userController;
     private User user;
+    private NewUserRequest newUser;
+    private UpdateUserRequest updateUser;
 
     @BeforeEach
     void generateData() {
-        userController = new UserController(new UserService(new InMemoryUserStorage()));
-        user = new User(1L, "email@gmail.com", "Login", "Name",
-                LocalDate.parse("2000-01-01"));
+        user = new User(1L, "1email@gmail.com", "Login1", "Name1",
+                LocalDate.parse("2001-01-01"));
+        newUser = new NewUserRequest("2email@gmail.com", "Login2", "Name2",
+                LocalDate.parse("2002-02-02"), new HashSet<>());
+        updateUser = new UpdateUserRequest(1L, "3email@gmail.com", "Login3", "Name3",
+                LocalDate.parse("2003-03-03"), new HashSet<>());
     }
 
     @Test
     void addUserTest() {
-        userController.addUser(user);
-        assertEquals(user, new ArrayList<>(userController.getUsers()).getFirst(),
-                "Метод addUser или getUsers работает неправильно");
+        userController.addUser(newUser);
+        user = userController.getUserById(1);
+        assertEquals(newUser.getEmail(), user.getEmail(), "Метод addUser неправильно сохранил email");
+        assertEquals(newUser.getLogin(), user.getLogin(), "Метод addUser неправильно сохранил login");
+        assertEquals(newUser.getName(), user.getName(), "Метод addUser неправильно сохранил name");
+        assertEquals(newUser.getBirthday(), user.getBirthday(), "Метод addUser неправильно сохранил birthday");
+        assertEquals(newUser.getFriends(), user.getFriends(), "Метод addUser неправильно сохранил friends");
     }
 
     @Test
     void updateUserTest() {
-        User user2 = new User(1L, "email-2@gmail.com", "Login2", "Name2",
-                LocalDate.parse("2002-01-01"));
-        userController.addUser(user);
-        userController.updateUser(user2);
-        assertEquals(user2, new ArrayList<>(userController.getUsers()).getFirst(),
-                "Метод updateUser или getUsers работает неправильно");
+        userController.addUser(newUser);
+        userController.updateUser(updateUser);
+        user = userController.getUserById(1);
+        assertEquals(user.getEmail(), updateUser.getEmail(), "Метод updateUser неправильно сохранил email");
+        assertEquals(user.getLogin(), updateUser.getLogin(), "Метод updateUser неправильно сохранил login");
+        assertEquals(user.getName(), updateUser.getName(), "Метод updateUser неправильно сохранил name");
+        assertEquals(user.getBirthday(), updateUser.getBirthday(), "Метод updateUser неправильно сохранил birthday");
+        assertEquals(user.getFriends(), updateUser.getFriends(), "Метод updateUser неправильно сохранил friends");
     }
 
     @Test
-    void validateRightUserTest() {
-        assertDoesNotThrow(() -> userController.addUser(user),
-                "Валидация не пропустила пользователя с правильными полями");
+    public void getUsersTest() {
+        userController.addUser(newUser);
+        newUser.setEmail("3email@gmail.com");
+        userController.addUser(newUser);
+        List<User> users = List.of(userController.getUserById(1), userController.getUserById(2));
+        assertEquals(users, userController.getUsers(), "Метод getUsers работает неправильно");
     }
 
     @Test
-    void validateUserEmailTest() {
-        user.setEmail(null);
-        assertThrows(ValidationException.class, () -> userController.addUser(user),
-                "Валидация пропустила null в email");
-
-        user.setEmail("");
-        assertThrows(ValidationException.class, () -> userController.updateUser(user),
-                "Валидация пропустила пустую строку в email");
-
-        user.setEmail(" ");
-        assertThrows(ValidationException.class, () -> userController.updateUser(user),
-                "Валидация пропустила email из одного пробела");
-
-        user.setEmail("email-2gmail.com");
-        assertThrows(ValidationException.class, () -> userController.updateUser(user),
-                "Валидация пропустила email пользователя без символа @");
+    public void getUserByIdTest() {
+        userController.addUser(newUser);
+        user = userController.getUserById(1);
+        assertEquals(user, userController.getUserById(1), "Метод getUserById работает неправильно");
     }
 
     @Test
-    void validateUserLoginTest() {
-        user.setLogin(null);
-        assertThrows(ValidationException.class, () -> userController.addUser(user),
-                "Валидация пропустила null в логин");
-
-        user.setLogin("");
-        assertThrows(ValidationException.class, () -> userController.updateUser(user),
-                "Валидация пропустила пустую строку в логин");
-
-        user.setLogin(" ");
-        assertThrows(ValidationException.class, () -> userController.updateUser(user),
-                "Валидация пропустила логин из одного пробела");
-
-        user.setLogin("Login login");
-        assertThrows(ValidationException.class, () -> userController.updateUser(user),
-                "Валидация пропустила логин пользователя с символом пробела");
+    public void addFriendTest() {
+        userController.addUser(newUser);
+        newUser.setEmail("3email@gmail.com");
+        userController.addUser(newUser);
+        userController.addFriend(1, 2);
+        assertEquals(new HashSet<>(), userController.getUserById(2).getFriends(),
+                "Метод addFriend добавляет пользователя в друзья друга");
+        assertEquals(Set.of(2L), userController.getUserById(1).getFriends(),
+                "Метод addFriend не добавляет друга");
     }
 
     @Test
-    void validateUserNameTest() {
-        user.setName(null);
-        userController.addUser(user);
-        assertEquals(user.getLogin(), user.getName(),
-                "Валидация не присвоила логин имени пользователя из null");
-
-        user.setName("");
-        userController.updateUser(user);
-        assertEquals(user.getLogin(), user.getName(),
-                "Валидация не присвоила логин имени пользователя из пустой строки");
-
-        user.setName(" ");
-        userController.updateUser(user);
-        assertEquals(user.getLogin(), user.getName(),
-                "Валидация не присвоила логин имени пользователя из одного пробела");
+    public void deleteFriendTest() {
+        userController.addUser(newUser);
+        newUser.setEmail("3email@gmail.com");
+        userController.addUser(newUser);
+        userController.addFriend(1, 2);
+        userController.deleteFriend(1, 2);
+        assertEquals(new HashSet<>(), userController.getUserById(2).getFriends(),
+                "Метод deleteFriend не удаляет друга у пользователя");
     }
 
     @Test
-    void validateUserBirthdayTest() {
-        user.setBirthday(LocalDate.now().plus(Period.ofDays(1)));
-        assertThrows(ValidationException.class, () -> userController.addUser(user),
-                "Валидация пропустила дату рождения пользователя в будущем");
+    public void getFriendsTest() {
+        userController.addUser(newUser);
+        newUser.setEmail("3email@gmail.com");
+        userController.addUser(newUser);
+        userController.addFriend(1, 2);
+        assertEquals(Set.of(2L), userController.getUserById(1).getFriends(),
+                "Метод getFriend работает неправильно");
+    }
+
+    @Test
+    public void getMutualFriendsTest() {
+        userController.addUser(newUser);
+        newUser.setEmail("3email@gmail.com");
+        userController.addUser(newUser);
+        newUser.setEmail("4email@gmail.com");
+        userController.addUser(newUser);
+        userController.addFriend(1, 3);
+        userController.addFriend(2, 3);
+        assertEquals(List.of(userController.getUserById(3)), userController.getMutualFriends(1, 2),
+                "Метод getMutualFriends работает неправильно");
     }
 }

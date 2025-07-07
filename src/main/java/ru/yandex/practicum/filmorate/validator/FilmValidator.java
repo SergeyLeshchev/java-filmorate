@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.validator;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -45,6 +46,11 @@ public class FilmValidator {
         if (film.getRate() < 0 || film.getRate() > 10) {
             log.warn("Исключение ValidationException. Оценка фильма должна быть от 0 до 10 баллов");
             throw new ValidationException("Оценка фильма должна быть от 0 до 10 баллов");
+        }
+
+        if (film.getMpa().getId() > 5) {
+            log.warn("Исключение NotFoundException. Mpa фильма должен быть от 1 до 5 включительно");
+            throw new NotFoundException("Mpa с таким id не найдено");
         }
         log.info("Валидация данных фильма {} прошла успешно", film);
     }

@@ -26,7 +26,7 @@ Backend: Java 21, Spring Boot, Spring MVC, Spring JDBC
 Кэширование популярных фильмов на уровне сервиса
 Обработка ошибок: Единый механизм через кастомные исключения (NotFoundException, ConditionsNotMetException)
 
-![На данной диаграмме БД изображена схема связей между таблицами.](https://github.com/SergeyLeshchev/java-filmorate/blob/main/dbdiagram.png)
+![На данной диаграмме БД изображена схема связей между таблицами.](https://raw.githubusercontent.com/SergeyLeshchev/java-filmorate/main/dbdiagram.png)
 
 Примеры некоторых запросов:  
 Для получения списка с названиями фильмов:  
